@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Settings - Komado Portal</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Komado Logo" class="dashboard-logo">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="#" class="active">Profile Settings</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <div class="profile-box">
+                <h1>Profile Settings</h1>
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" value="{{ user.username }}" {% if user.role != 'Admin' %}readonly class="readonly"{% endif %}>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ user.email }}" {% if user.role != 'Admin' %}readonly class="readonly"{% endif %}>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="new_password" placeholder="Enter new password">
+                    </div>
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

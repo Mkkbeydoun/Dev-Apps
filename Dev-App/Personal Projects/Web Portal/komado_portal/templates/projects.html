@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Management - Komado Portal</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Komado Logo" class="dashboard-logo">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="#" class="active">Projects</a></li>
+                {% if user.role == 'Admin' %}
+                    <li><a href="{{ url_for('admin_users') }}">User Management</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <header>
+                <h1>Project Management</h1>
+                <div class="user-info">
+                    <span>{{ user.role }}</span>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </header>
+            
+            <div class="project-container">
+                {% if user.role in ['Admin', 'Manager'] %}
+                <div class="add-project-section">
+                    <h2>Create New Project</h2>
+                    <form action="{{ url_for('create_project') }}" method="POST">
+                        <input type="text" name="title" placeholder="Project Title" required>
+                        <textarea name="description" placeholder="Project Description" required></textarea>
+                        <select name="status">
+                            <option value="Planning">Planning</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <button type="submit">Create Project</button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div class="project-board">
+                    {% for project in projects %}
+                    <div class="project-card" data-project-id="{{ project.id }}">
+
+                        <div class="project-header">
+                            <h3>{{ project.title }}</h3>
+                            {% if user.role in ['Admin', 'Manager'] %}
+                            <div class="project-actions">
+                                <button onclick="editProject({{ project.id }})" class="edit-btn">Edit</button>
+                                <button onclick="deleteProject({{ project.id }})" class="delete-btn">Delete</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <p>{{ project.description }}</p>
+                        <div class="project-status">Status: {{ project.status }}</div>
+                        
+                        <div class="task-board">
+                            <div class="task-column" data-status="To Do">
+                                <h4>To Do</h4>
+                                {% for task in project.tasks if task.status == 'To Do' %}
+                                <div class="task-item" draggable="true" data-task-id="{{ task.id }}">
+                                    <h5>{{ task.title }}</h5>
+                                    <p>{{ task.description }}</p>
+                                    <small>Due: {{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="task-column" data-status="In Progress">
+                                <h4>In Progress</h4>
+                                {% for task in project.tasks if task.status == 'In Progress' %}
+                                <div class="task-item" draggable="true" data-task-id="{{ task.id }}">
+                                    <h5>{{ task.title }}</h5>
+                                    <p>{{ task.description }}</p>
+                                    <small>Due: {{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="task-column" data-status="Done">
+                                <h4>Done</h4>
+                                {% for task in project.tasks if task.status == 'Done' %}
+                                <div class="task-item" draggable="true" data-task-id="{{ task.id }}">
+                                    <h5>{{ task.title }}</h5>
+                                    <p>{{ task.description }}</p>
+                                    <small>Due: {{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {% if user.role in ['Admin', 'Manager'] %}
+                        <button onclick="showAddTaskForm({{ project.id }})" class="add-task-btn">+ Add Task</button>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Task</h3>
+            <form id="addTaskForm">
+                <input type="text" name="title" placeholder="Task Title" required>
+                <textarea name="description" placeholder="Task Description" required></textarea>
+                <input type="date" name="due_date" required>
+                <select name="assigned_to" required>
+                    {% for team_member in users if team_member.role == 'Team Member' %}
+                    <option value="{{ team_member.id }}">{{ team_member.username }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Add Task</button>
+            </form>
+        </div>
+    </div>
+
+<div id="editProjectModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit Project</h2>
+        <form id="editProjectForm">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status">
+                    <option value="Planning">Planning</option>
+                    <option value="Active">Active</option>
+                    <option value="On Hold">On Hold</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

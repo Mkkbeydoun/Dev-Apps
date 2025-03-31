@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Komado Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <nav class="sidebar">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Komado Logo" class="dashboard-logo">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}" class="active">Dashboard</a></li>
+                {% if user.role in ['Admin', 'Manager'] %}
+                    <li><a href="{{ url_for('projects') }}">Project Management</a></li>
+                    <li><a href="{{ url_for('team_overview') }}">Team Overview</a></li>
+                {% endif %}
+                {% if user.role == 'Admin' %}
+                    <li><a href="{{ url_for('admin_users') }}">User Management</a></li>
+                    <li><a href="{{ url_for('system_settings') }}">System Settings</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('tasks') }}">My Tasks</a></li>
+                <li><a href="{{ url_for('admin_profile') }}">Profile Settings</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <header>
+                <h1>Welcome to Komado Dashboard</h1>
+                <div class="user-info">
+                    <div class="notification-bell">
+                        <span class="bell-icon">🔔</span>
+                        <span class="notification-count">0</span>
+                        <div class="notification-dropdown">
+                            <div class="notification-list"></div>
+                        </div>
+                    </div>
+                    <span>{{ user.role }}</span>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                {% if user.role == 'Admin' %}
+                    <div class="card">
+                        <h3>Active Projects</h3>
+                        <p class="number">12</p>
+                    </div>
+                    <div class="card">
+                        <h3>Pending Tasks</h3>
+                        <p class="number">24</p>
+                    </div>
+                    <div class="card">
+                        <h3>Team Members</h3>
+                        <p class="number">8</p>
+                    </div>
+                    <div class="card">
+                        <h3>Completed</h3>
+                        <p class="number">36</p>
+                    </div>
+                {% elif user.role == 'Manager' %}
+                    <div class="card">
+                        <h3>Team Projects</h3>
+                        <p class="number">5</p>
+                    </div>
+                    <div class="card">
+                        <h3>Team Tasks</h3>
+                        <p class="number">15</p>
+                    </div>
+                    <div class="card">
+                        <h3>Team Members</h3>
+                        <p class="number">4</p>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <h3>My Tasks</h3>
+                        <p class="number">6</p>
+                    </div>
+                    <div class="card">
+                        <h3>Completed Tasks</h3>
+                        <p class="number">12</p>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
